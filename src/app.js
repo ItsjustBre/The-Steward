@@ -358,9 +358,11 @@ class TitanBot extends Client {
       )
     );
 
-   // THE CONTINENTAL WIRE
-// Unified Twitch + Kick + YouTube monitoring
-startUnifiedContinentalWire(this);
+  // THE CONTINENTAL WIRE
+    startUnifiedContinentalWire(this);
+  }
+
+  async updateAllCounters() {
 
   async updateAllCounters() {
     if (!this.db) {
