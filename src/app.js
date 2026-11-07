@@ -704,5 +704,3 @@ try {
 }
 
 export default TitanBot;
-
-export default TitanBot;
