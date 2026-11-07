@@ -341,7 +341,7 @@ class TitanBot extends Client {
     startServer(configuredPort, 0);
   }
 
-  setupCronJobs() {
+ setupCronJobs() {
     // Birthday checks — daily at 6 AM
     cron.schedule(
       '0 6 * * *',
@@ -370,11 +370,11 @@ class TitanBot extends Client {
     );
 
     // THE CONTINENTAL WIRE
-// Twitch, YouTube and Kick monitoring
-startContinentalWire(this);
-startYouTubeMonitor(this);
-startKickMonitor(this);
-
+    // Twitch, YouTube and Kick monitoring
+    startContinentalWire(this);
+    startYouTubeMonitor(this);
+    startKickMonitor(this);
+  }
 
   async updateAllCounters() {
     if (!this.db) {
