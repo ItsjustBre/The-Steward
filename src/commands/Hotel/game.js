@@ -1,7 +1,6 @@
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('game')
     .setDescription('Visit The B Continental Gaming Lounge.'),
