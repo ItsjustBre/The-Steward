@@ -1,36 +1,103 @@
-import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  MessageFlags
+} from 'discord.js';
+
 import { createEmbed } from '../../utils/embeds.js';
 import { logger } from '../../utils/logger.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 
+function buildPingEmbed(latency, gatewayLatency) {
+  const status =
+    gatewayLatency < 150 ? '🟢 Stable' :
+    gatewayLatency < 300 ? '🟡 Elevated Latency' :
+    '🔴 High Latency';
+
+  return createEmbed({
+    title: '🗝️ THE STEWARD | CONNECTION STATUS',
+    description:
+      'The B Continental communication systems are responding.',
+    color: 'primary'
+  })
+    .addFields(
+      {
+        name: '📡 Gateway Latency',
+        value: `${gatewayLatency} ms`,
+        inline: true
+      },
+      {
+        name: '⚡ Response Time',
+        value: `${latency} ms`,
+        inline: true
+      },
+      {
+        name: '🏨 Connection Status',
+        value: status,
+        inline: false
+      }
+    )
+    .setFooter({
+      text: 'THE B CONTINENTAL • Systems Administration'
+    })
+    .setTimestamp();
+}
+
 export default {
-    data: new SlashCommandBuilder()
-        .setName("ping")
-        .setDescription("Checks the bot's latency and API speed"),
+  data: new SlashCommandBuilder()
+    .setName('ping')
+    .setDescription('Check The Steward connection status'),
 
-    async prefixExecute(interaction) {
-        try {
-            const startTime = Date.now();
-            const pingingMessage = await interaction.reply({ content: 'Pinging...' });
+  category: 'Core',
 
-            const latency = Date.now() - startTime;
-            const apiLatency = Math.max(0, Math.round(interaction.client.ws.ping));
+  async prefixExecute(message) {
+    try {
+      const start = Date.now();
 
-            const embed = createEmbed({ title: 'Pong!', description: null }).addFields(
-                { name: 'Bot Latency', value: `${latency}ms`, inline: true },
-                { name: 'API Latency', value: `${apiLatency}ms`, inline: true },
-            );
+      const reply = await message.reply({
+        content: '🗝️ Checking Continental communications...'
+      });
 
-            await pingingMessage.edit({ content: null, embeds: [embed] });
-        } catch (error) {
-            logger.error('Ping prefix command error:', error);
-            if (!interaction.replied && !interaction._replyMessage) {
-                await interaction.channel.send({
-                    embeds: [createEmbed({ title: 'System Error', description: 'Could not determine latency at this time.', color: 'error' })],
-                }).catch(() => {});
-            }
-        }
-    },
+      const latency = Date.now() - start;
+      const gatewayLatency = Math.max(
+        0,
+        Math.round(message.client.ws.ping)
+      );
+
+      await reply.edit({
+        content: '',
+        embeds: [buildPingEmbed(latency, gatewayLatency)]
+      });
+    } catch (error) {
+      logger.error('Steward prefix ping error:', error);
+    }
+  },
+
+  async execute(interaction) {
+    try {
+      const start = Date.now();
+
+      const deferred = await InteractionHelper.safeDefer(
+        interaction,
+        { flags: MessageFlags.Ephemeral }
+      );
+
+      if (!deferred) return;
+
+      const latency = Date.now() - start;
+      const gatewayLatency = Math.max(
+        0,
+        Math.round(interaction.client.ws.ping)
+      );
+
+      await InteractionHelper.safeEditReply(interaction, {
+        embeds: [buildPingEmbed(latency, gatewayLatency)]
+      });
+
+    } catch (error) {
+      logger.error('Steward ping error:', error);
+    }
+  }
+};
 
     async execute(interaction) {
         logger.info('execute called - checking if slash command or prefix command');
