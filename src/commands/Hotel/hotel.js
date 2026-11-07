@@ -7,6 +7,7 @@ import {
 export default {
   slashOnly: true,
   category: 'Hotel',
+
   data: new SlashCommandBuilder()
     .setName('hotel')
     .setDescription('The B Continental — Guest Services')
@@ -73,21 +74,19 @@ export default {
         .setDescription('Request private assistance from the Service Desk')
     ),
 
-  category: 'Hotel',
-
   async execute(interaction) {
     try {
       const command = interaction.options.getSubcommand();
 
-      // Existing hotel departments
+      // HOTEL DEPARTMENT MODULES
       const hotelCommands = {
-  concierge: './modules/concierge.js',
-  registry: './modules/registry.js',
-  amenities: './modules/amenities.js',
-  rules: './modules/house-rules.js',
-  service: './modules/service.js',
-  status: '/modules/status.js
-};
+        concierge: './modules/concierge.js',
+        registry: './modules/registry.js',
+        amenities: './modules/amenities.js',
+        rules: './modules/house-rules.js',
+        service: './modules/service.js'
+      };
+
       if (hotelCommands[command]) {
         const module = await import(hotelCommands[command]);
         return await module.default.execute(interaction);
