@@ -1,41 +1,31 @@
-import { SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, MessageFlags } from 'discord.js';
-import { createEmbed } from '../../utils/embeds.js';
-import { logger } from '../../utils/logger.js';
+import {
+  SlashCommandBuilder,
+  MessageFlags
+} from 'discord.js';
 
-import { InteractionHelper } from '../../utils/interactionHelper.js';
-const SUPPORT_SERVER_URL = "https://discord.gg/QnWNz2dKCE";
 export default {
-    data: new SlashCommandBuilder()
-    .setName("support")
-    .setDescription("Get link to the support server"),
+  data: new SlashCommandBuilder()
+    .setName('support')
+    .setDescription('Contact Guest Services at The B Continental'),
+
+  category: 'Core',
 
   async execute(interaction) {
-    try {
-      const supportButton = new ButtonBuilder()
-        .setLabel("Join Support Server")
-        .setStyle(ButtonStyle.Link)
-        .setURL(SUPPORT_SERVER_URL);
-
-      const actionRow = new ActionRowBuilder().addComponents(supportButton);
-
-      await InteractionHelper.safeReply(interaction, {
-        embeds: [
-          createEmbed({ title: "Need Help?", description: "Join our official support server for assistance, report bugs, or suggest features. If you are customizing this bot, remember to change the link in the code!" }),
-        ],
-        components: [actionRow],
-        flags: MessageFlags.Ephemeral,
-      });
-    } catch (error) {
-      logger.error('Support command error:', error);
-      
-      try {
-        return await InteractionHelper.safeReply(interaction, {
-          embeds: [createEmbed({ title: 'System Error', description: 'Could not display support information.', color: 'error' })],
-          flags: MessageFlags.Ephemeral,
-        });
-      } catch (replyError) {
-        logger.error('Failed to send error reply:', replyError);
-      }
-    }
-  },
+    await interaction.reply({
+      embeds: [{
+        color: 0x6A0D25,
+        title: '🗝️ THE B CONTINENTAL | GUEST ASSISTANCE',
+        description:
+          'Welcome to Guest Assistance.\n\n' +
+          '🛎️ **The Concierge** — General inquiries\n' +
+          '🛡️ **The Consiglieres** — Community concerns\n' +
+          '⚙️ **The Steward** — Technical assistance\n\n' +
+          'To contact management, use **`/service`** to open our official Guest Services request form.',
+        footer: {
+          text: 'THE B CONTINENTAL • By Order of Management'
+        }
+      }],
+      flags: MessageFlags.Ephemeral
+    });
+  }
 };
