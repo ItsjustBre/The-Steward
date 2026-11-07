@@ -30,7 +30,10 @@ export function startContinentalWire(client) {
     try {
       const stream = await checkTwitchLive();
 
-      if (!stream.isLive) return;
+      if (!stream.isLive) {
+  console.log('[Continental Wire] Twitch is offline — monitoring successful');
+  return;
+}
 
       const needsAnnouncement = await shouldAnnounce(stream);
 
