@@ -53,8 +53,13 @@ export async function buildLoggingDashboardView(interaction, client) {
   const { enabled: enabledCount, total } = countEnabledCategories(loggingStatus.enabledEvents, auditEnabled);
 
   const embed = new EmbedBuilder()
-    .setTitle('📝 Logging Dashboard')
-    .setDescription(`Manage server logging for **${interaction.guild.name}**. Use the menu below to configure channels, categories, and filters.`)
+    .setTitle('🛡️ THE STEWARD | SECURITY & RECORDS')
+    .setDescription(
+        `**The B Continental — Security Office**\n\n` +
+        `Welcome to the Continental's security administration system.\n\n` +
+        `Manage surveillance records, event logging, and security filters for **${interaction.guild.name}**.\n\n` +
+        `Select an option below to configure the logging system.`
+)
     .setColor(auditEnabled ? getColor('success') : getColor('warning'))
     .addFields(
       {
@@ -90,7 +95,9 @@ export async function buildLoggingDashboardView(interaction, client) {
         inline: false,
       },
     )
-    .setFooter({ text: 'Ticket channels: configure via /ticket dashboard' })
+    .setFooter({
+  text: 'THE B CONTINENTAL • Security Office | Tickets: /ticket dashboard'
+})
     .setTimestamp();
 
   const components = createLoggingDashboardComponents(loggingStatus.enabledEvents, auditEnabled);
@@ -136,21 +143,14 @@ export async function buildLoggingFilterView(interaction, client) {
     : '*No ignored channels*';
 
   const embed = new EmbedBuilder()
-    .setTitle('🛡️ THE STEWARD | SECURITY & RECORDS')
-.setDescription(
-  `**The B Continental — Security Office**\n\n` +
-  `Welcome to the Continental's security administration system.\n\n` +
-  `Manage surveillance records, event logging, and security filters for **${interaction.guild.name}**.\n\n` +
-  `Select an option below to configure the logging system.`
-)
+   .setTitle('🔇 THE STEWARD | SECURITY EXEMPTIONS')
+    .setDescription('Users and channels on this list will be skipped when sending audit logs.')
     .setColor(getColor('info'))
     .addFields(
       { name: 'Ignored Users', value: userLines.slice(0, 1024), inline: false },
       { name: 'Ignored Channels', value: channelLines.slice(0, 1024), inline: false },
     )
-    .setFooter({
-  text: 'THE B CONTINENTAL • Security Office | Tickets: /ticket dashboard'
-})
+    .setFooter({ text: 'Use the buttons below to add or remove filters' })
     .setTimestamp();
 
   const components = createLoggingFilterComponents();
@@ -163,7 +163,8 @@ export function isCategoriesView(interaction) {
 }
 
 export function isFilterView(interaction) {
-  return interaction.message?.embeds?.[0]?.title === '🔇 Log Ignore Filters';
+  return interaction.message?.embeds?.[0]?.title ===
+    '🔇 THE STEWARD | SECURITY EXEMPTIONS';
 }
 
 export async function refreshDashboardMessage(interaction, client) {
