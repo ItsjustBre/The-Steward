@@ -397,6 +397,22 @@ export default {
             }
             return;
           }
+          if (interaction.customId === 'continental_service_request') {
+      try {
+        const service = await import('../commands/Hotel/service.js');
+        await service.default.handleModal(interaction);
+      } catch (error) {
+        console.error('Continental Service Desk error:', error);
+
+        if (!interaction.replied && !interaction.deferred) {
+          await interaction.reply({
+            content: '🔔 The service desk encountered an error. Please contact Management.',
+            ephemeral: true
+          });
+        }
+      }
+      return;
+    }
 
           if (
             interaction.customId.startsWith('app_review_')
