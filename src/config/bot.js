@@ -138,6 +138,16 @@ export const botConfig = {
         high: "#f1c40f",
         urgent: "#e74c3c",
       },
+
+    export const COLORS = {
+  GOLD: 0xC8A96A,
+  BURGUNDY: 0x650D28,
+  PINK: 0xFF4FA3,
+  BLACK: 0x17131C,
+  SUCCESS: 0x2E8B57,
+  DANGER: 0xB32635,
+};
+      
     },
     footer: {
       // Default footer text used in bot embeds.
