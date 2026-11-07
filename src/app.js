@@ -16,6 +16,7 @@ import { initializeMusic } from './services/music/riffySetup.js';
 import { shutdownMusic } from './services/music/playerHandler.js';
 import pkg from '../package.json' with { type: 'json' };
 import { EXPECTED_SCHEMA_VERSION, EXPECTED_SCHEMA_LABEL } from './config/database/schemaVersion.js';
+import { testContinentalWire } from './services/continentalWire/testAnnouncement.js';
 
 import {
   startContinentalWire,
@@ -340,6 +341,9 @@ class TitanBot extends Client {
         () => checkBirthdays(this)
       )
     );
+
+    // Send one test announcement when the bot starts
+testContinentalWire(this);
 
     // Giveaway checks — every minute
     cron.schedule(
