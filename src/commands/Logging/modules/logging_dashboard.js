@@ -108,7 +108,7 @@ export async function buildLoggingCategoriesView(interaction, client) {
   }).join('\n');
 
   const embed = new EmbedBuilder()
-    .setTitle('📋 Event Categories')
+    .setTitle('📋 THE STEWARD | SECURITY EVENTS')
     .setDescription(
       auditEnabled
         ? 'Toggle which types of events are logged to your audit channel.'
@@ -158,7 +158,8 @@ export async function buildLoggingFilterView(interaction, client) {
 }
 
 export function isCategoriesView(interaction) {
-  return interaction.message?.embeds?.[0]?.title === '📋 Event Categories';
+  return interaction.message?.embeds?.[0]?.title ===
+    '📋 THE STEWARD | SECURITY EVENTS';
 }
 
 export function isFilterView(interaction) {
