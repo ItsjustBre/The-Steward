@@ -1,4 +1,3 @@
-
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
@@ -49,3 +48,7 @@ export default {
     });
   }
 };
+
+
+
+Commit and test
