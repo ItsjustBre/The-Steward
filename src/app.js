@@ -19,6 +19,7 @@ import { EXPECTED_SCHEMA_VERSION, EXPECTED_SCHEMA_LABEL } from './config/databas
 import { startContinentalWire, stopContinentalWire } from './services/continentalWire/liveScheduler.js';
 import { startYouTubeMonitor, stopYouTubeMonitor } from './services/continentalWire/youtubeScheduler.js';
 import { startKickMonitor, stopKickMonitor } from './services/continentalWire/kickScheduler.js';
+import { startUnifiedContinentalWire, stopUnifiedContinentalWire } from './services/continentalWire/unifiedScheduler.js';
 
 class TitanBot extends Client {
   constructor() {
@@ -357,12 +358,9 @@ class TitanBot extends Client {
       )
     );
 
-    // THE CONTINENTAL WIRE
-    // Twitch, YouTube and Kick monitoring
-    startContinentalWire(this);
-    startYouTubeMonitor(this);
-    startKickMonitor(this);
-  }
+   // THE CONTINENTAL WIRE
+// Unified Twitch + Kick + YouTube monitoring
+startUnifiedContinentalWire(this);
 
   async updateAllCounters() {
     if (!this.db) {
@@ -536,10 +534,8 @@ class TitanBot extends Client {
 
       logger.info('✅ Cron jobs stopped');
 
-      // Stop all Continental Wire monitors
-stopContinentalWire();
-stopYouTubeMonitor();
-stopKickMonitor();
+      // Stop unified Continental Wire
+stopUnifiedContinentalWire();
 
       logger.info(
         '✅ Continental Wire stopped'
