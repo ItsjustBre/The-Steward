@@ -604,3 +604,40 @@ export default {
             );
           }
         }
+} // End interaction type handling
+
+      } catch (error) {
+        logger.error('Unhandled error in interactionCreate:', {
+          event: 'interaction.unhandled_error',
+          errorCode: ErrorCodes.INTERACTION_UNHANDLED,
+          error,
+          traceId: interactionTraceContext.traceId,
+          interactionId: interaction.id,
+          guildId: interaction.guildId,
+          userId: interaction.user?.id
+        });
+
+        try {
+          await handleInteractionError(
+            interaction,
+            error,
+            withTraceContext({
+              type: 'interaction',
+              commandName: interaction.commandName,
+              customId: interaction.customId,
+              source: 'interactionCreate.unhandled'
+            }, interactionTraceContext)
+          );
+
+        } catch (replyError) {
+          logger.error('Failed to send fallback error response:', {
+            event: 'interaction.error_response_failed',
+            errorCode: ErrorCodes.INTERACTION_RESPONSE_FAILED,
+            error: replyError,
+            traceId: interactionTraceContext.traceId
+          });
+        }
+      }
+    });
+  }
+};
