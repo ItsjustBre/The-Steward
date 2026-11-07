@@ -119,13 +119,15 @@ export function buildOverviewEmbed(snapshot, guild) {
   });
 
   return createEmbed({
-    title: '⚙️ Command Access',
-    description: `Manage slash and prefix commands for **${guild.name}**. Subcommands (e.g. \`birthday list\`) are listed separately.`,
-    color: 'info',
-    fields,
-    footer: '🔒 commands & configwizard always stay available',
-  });
-}
+  title: '🗝️ THE STEWARD | COMMAND AUTHORITY',
+  description:
+    `**The B Continental — Management Office**\n\n` +
+    `Manage command permissions for **${guild.name}**.\n` +
+    `Select a department below to authorize or restrict its services.`,
+  color: 'primary',
+  fields,
+  footer: 'THE B CONTINENTAL • Authorized Management Only',
+});
 
 export function buildCategoryEmbed(category, guild) {
   const statusIcon = getCategoryStatus(category);
