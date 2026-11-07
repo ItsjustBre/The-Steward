@@ -6,9 +6,9 @@ import { logger } from '../../../utils/logger.js';
 
 import { replyUserError, ErrorTypes } from '../../../utils/errorHandler.js';
 const DESTINATION_LABELS = {
-  audit: 'Audit Log',
-  applications: 'Applications',
-  reports: 'Reports',
+  audit: 'Security Records',
+  applications: 'Guest Applications',
+  reports: 'Incident Reports',
 };
 
 export default {
@@ -30,7 +30,7 @@ export default {
         return InteractionHelper.safeEditReply(interaction, {
           embeds: [successEmbed(
             'Channel Cleared',
-            `The **${DESTINATION_LABELS[destination]}** channel has been removed.`,
+            '🛡️ Security Destination Updated',
           )],
         });
       }
