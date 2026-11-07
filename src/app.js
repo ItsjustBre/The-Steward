@@ -16,10 +16,10 @@ import { initializeMusic } from './services/music/riffySetup.js';
 import { shutdownMusic } from './services/music/playerHandler.js';
 import pkg from '../package.json' with { type: 'json' };
 import { EXPECTED_SCHEMA_VERSION, EXPECTED_SCHEMA_LABEL } from './config/database/schemaVersion.js';
-import { startContinentalWire, stopContinentalWire } from './services/continentalWire/liveScheduler.js';
-import { startYouTubeMonitor, stopYouTubeMonitor } from './services/continentalWire/youtubeScheduler.js';
-import { startKickMonitor, stopKickMonitor } from './services/continentalWire/kickScheduler.js';
-import { startUnifiedContinentalWire, stopUnifiedContinentalWire } from './services/continentalWire/unifiedScheduler.js';
+import {
+  startUnifiedContinentalWire,
+  stopUnifiedContinentalWire
+} from './services/continentalWire/unifiedScheduler.js';
 
 class TitanBot extends Client {
   constructor() {
@@ -330,7 +330,7 @@ class TitanBot extends Client {
     startServer(configuredPort, 0);
   }
 
- setupCronJobs() {
+  setupCronJobs() {
     // Birthday checks — daily at 6 AM
     cron.schedule(
       '0 6 * * *',
@@ -358,11 +358,10 @@ class TitanBot extends Client {
       )
     );
 
-  // THE CONTINENTAL WIRE
+    // THE CONTINENTAL WIRE
+    // Unified Twitch + Kick + YouTube monitoring
     startUnifiedContinentalWire(this);
   }
-
-  async updateAllCounters() {
 
   async updateAllCounters() {
     if (!this.db) {
@@ -537,7 +536,7 @@ class TitanBot extends Client {
       logger.info('✅ Cron jobs stopped');
 
       // Stop unified Continental Wire
-stopUnifiedContinentalWire();
+      stopUnifiedContinentalWire();
 
       logger.info(
         '✅ Continental Wire stopped'
