@@ -48,7 +48,3 @@ export default {
     });
   }
 };
-
-
-
-Commit and test
