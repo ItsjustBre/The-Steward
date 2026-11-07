@@ -96,8 +96,25 @@ export async function loadCommands(client) {
             }
             
         } catch (error) {
-            logger.error(`Error loading command from ${filePath}:`, error);
-        }
+    const relativePath = path.relative(
+        path.join(__dirname, '../../commands'),
+        filePath
+    );
+
+    logger.error(
+        `[COMMAND LOAD FAILED] ${relativePath} | ${error.name}: ${error.message}`
+    );
+
+    console.error(
+        `\n========== THE STEWARD | COMMAND ERROR ==========`
+    );
+    console.error(`FILE: ${filePath}`);
+    console.error(`ERROR: ${error.message}`);
+    console.error(error.stack);
+    console.error(
+        `=================================================\n`
+    );
+}
     }
     
     const commandsWithSubcommands = Array.from(client.commands.values()).filter(cmd => {
