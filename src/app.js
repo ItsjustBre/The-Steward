@@ -369,6 +369,7 @@ class TitanBot extends Client {
     // Uncomment the line below to activate monitoring.
 
    startContinentalWire(this);
+    startYouTubeMonitor(this);
   }
 
   async updateAllCounters() {
@@ -690,6 +691,7 @@ try {
   };
 
   setupShutdown();
+  stopYouTubeMonitor();
 
   bot.start().catch((error) => {
     logger.error(
