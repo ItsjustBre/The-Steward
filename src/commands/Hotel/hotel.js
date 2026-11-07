@@ -79,12 +79,12 @@ export default {
 
       // Existing hotel departments
       const hotelCommands = {
-        concierge: './concierge.js',
-        registry: './registry.js',
-        amenities: './amenities.js',
-        rules: './house-rules.js',
-        service: './service.js'
-      };
+  concierge: './modules/concierge.js',
+  registry: './registry.js',
+  amenities: './amenities.js',
+  rules: './house-rules.js',
+  service: './service.js'
+};
 
       if (hotelCommands[command]) {
         const module = await import(hotelCommands[command]);
