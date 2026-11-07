@@ -341,9 +341,6 @@ class TitanBot extends Client {
       )
     );
 
-    // Send one test announcement when the bot starts
-testContinentalWire(this);
-
     // Giveaway checks — every minute
     cron.schedule(
       '* * * * *',
