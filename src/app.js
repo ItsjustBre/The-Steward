@@ -363,7 +363,7 @@ class TitanBot extends Client {
     // Disabled until we finish testing.
     // Uncomment the line below to activate monitoring.
 
-    // startContinentalWire(this);
+   startContinentalWire(this);
   }
 
   async updateAllCounters() {
