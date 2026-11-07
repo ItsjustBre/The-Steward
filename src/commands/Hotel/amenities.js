@@ -30,9 +30,9 @@ export default {
           value: 'Everyday conversations, personal victories, recommendations, and the finer details of life.'
         },
         {
-          name: '🗝️ Guest Assistance',
-          value: 'Need assistance? Our staff is available through `/service`.'
-        }
+  name: '🗝️ Guest Assistance',
+  value: 'Need assistance? Our staff is available through `/hotel service`.'
+}
       )
       .setFooter({
         text: 'The B Continental • By Order of Management'
