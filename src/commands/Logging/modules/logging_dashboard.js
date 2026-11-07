@@ -136,14 +136,21 @@ export async function buildLoggingFilterView(interaction, client) {
     : '*No ignored channels*';
 
   const embed = new EmbedBuilder()
-    .setTitle('🔇 Log Ignore Filters')
-    .setDescription('Users and channels on this list will be skipped when sending audit logs.')
+    .setTitle('🛡️ THE STEWARD | SECURITY & RECORDS')
+.setDescription(
+  `**The B Continental — Security Office**\n\n` +
+  `Welcome to the Continental's security administration system.\n\n` +
+  `Manage surveillance records, event logging, and security filters for **${interaction.guild.name}**.\n\n` +
+  `Select an option below to configure the logging system.`
+)
     .setColor(getColor('info'))
     .addFields(
       { name: 'Ignored Users', value: userLines.slice(0, 1024), inline: false },
       { name: 'Ignored Channels', value: channelLines.slice(0, 1024), inline: false },
     )
-    .setFooter({ text: 'Use the buttons below to add or remove filters' })
+    .setFooter({
+  text: 'THE B CONTINENTAL • Security Office | Tickets: /ticket dashboard'
+})
     .setTimestamp();
 
   const components = createLoggingFilterComponents();
