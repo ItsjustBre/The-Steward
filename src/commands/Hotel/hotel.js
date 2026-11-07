@@ -80,7 +80,7 @@ export default {
       // Existing hotel departments
       const hotelCommands = {
   concierge: './modules/concierge.js',
-  registry: './registry.js',
+  registry: './modules/registry.js',
   amenities: './amenities.js',
   rules: './house-rules.js',
   service: './service.js'
