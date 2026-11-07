@@ -251,6 +251,7 @@ async function registerGlobalCommands(client, clientId, commands, totalSubcomman
     logger.info('Command validation passed');
 
     const commandsToRegister = prepareCommandsForRegistration(commands);
+    logger.warn(`HOTEL DEBUG: ${commandsToRegister.map(cmd => cmd.name).filter(name => ['hotel', 'concierge', 'amenities', 'house-rules'].includes(name)).join(', ') || 'NONE FOUND'}`);
 
     if (botConfig.commands?.deleteCommands) {
         logger.info('Clearing existing global commands before registration...');
