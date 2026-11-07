@@ -606,6 +606,8 @@ export default {
         }
 } // End interaction type handling
 
+      }
+
       } catch (error) {
         logger.error('Unhandled error in interactionCreate:', {
           event: 'interaction.unhandled_error',
