@@ -1,21 +1,24 @@
+
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('status')
-    .setDescription('View The B Continental operational status.'),
+    .setDescription('Check The B Continental operations desk'),
+
+  category: 'Hotel',
 
   async execute(interaction) {
-    const uptime = process.uptime();
+    const uptime = Math.floor(process.uptime());
     const hours = Math.floor(uptime / 3600);
     const minutes = Math.floor((uptime % 3600) / 60);
 
     const embed = new EmbedBuilder()
-      .setColor('#C6A667')
-      .setTitle('🏨 THE B CONTINENTAL | OPERATIONS')
+      .setColor(0xC8A96A)
+      .setTitle('🏨 THE B CONTINENTAL | Operations Desk')
       .setDescription(
         'Welcome to the Continental Operations Desk.\n\n' +
-        'The Steward is currently attending to hotel operations.'
+        'The Steward is on duty and ready to assist.'
       )
       .addFields(
         {
@@ -30,7 +33,7 @@ export default {
         },
         {
           name: '🥀 The Syndicate',
-          value: 'Community services available through Discord.',
+          value: 'Welcome to the family.',
           inline: false
         },
         {
@@ -39,13 +42,13 @@ export default {
           inline: false
         },
         {
-          name: '🛎️ Concierge Desk',
-          value: 'Use `/concierge` for assistance.',
+          name: '🛎️ Concierge',
+          value: 'Use `/concierge` for guest assistance.',
           inline: false
         },
         {
           name: '📜 House Rules',
-          value: 'Use `/house-rules` to review Continental etiquette.',
+          value: 'Use `/house-rules` for community guidelines.',
           inline: false
         },
         {
@@ -55,12 +58,10 @@ export default {
         }
       )
       .setFooter({
-        text: 'THE STEWARD • Under the Authority of Don Bre'
+        text: 'The B Continental • By Order of Don Bre'
       })
       .setTimestamp();
 
-    await interaction.reply({
-      embeds: [embed]
-    });
+    await interaction.reply({ embeds: [embed] });
   }
 };
