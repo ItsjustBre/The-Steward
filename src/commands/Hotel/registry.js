@@ -1,38 +1,54 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('registry')
-    .setDescription('View your guest registry at The B Continental.'),
+    .setDescription('View your Continental guest registry'),
+
+  category: 'Hotel',
 
   async execute(interaction) {
-    const member = interaction.member;
     const user = interaction.user;
+    const member = interaction.member;
 
     const joinedAt = member?.joinedAt
       ? `<t:${Math.floor(member.joinedAt.getTime() / 1000)}:D>`
       : 'Not available';
 
     const embed = new EmbedBuilder()
-      .setColor('#C6A667')
-      .setTitle('🗝️ THE B CONTINENTAL | GUEST REGISTRY')
+      .setColor(0xC8A96A)
+      .setTitle('📖 THE B CONTINENTAL | Guest Registry')
       .setDescription(
-        `**Registered Guest:** ${user}\n\n` +
-        `**Discord Username:** ${user.username}\n` +
-        `**Guest ID:** ${user.id}\n` +
-        `**Continental Arrival:** ${joinedAt}\n\n` +
-        '🥀 **Affiliation:** The Syndicate\n' +
-        '🏨 **Residence:** The B Continental\n' +
-        '👑 **Management:** Don Bre\n\n' +
-        '*Your presence is acknowledged. Your place in the Continental is recognized.*'
+        `Welcome back, ${user}.\n\n` +
+        'Your Continental membership information is on file.'
+      )
+      .addFields(
+        {
+          name: '🗝️ Registered Guest',
+          value: user.username
+        },
+        {
+          name: '🏨 Continental Arrival',
+          value: joinedAt
+        },
+        {
+          name: '🥀 Affiliation',
+          value: 'The Syndicate'
+        },
+        {
+          name: '👑 Management',
+          value: 'Don Bre'
+        }
       )
       .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: 'THE STEWARD • Official Guest Registry' })
+      .setFooter({
+        text: 'The B Continental • Official Guest Registry'
+      })
       .setTimestamp();
 
     await interaction.reply({
       embeds: [embed],
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 };
