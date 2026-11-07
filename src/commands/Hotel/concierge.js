@@ -63,7 +63,7 @@ export default {
         title: '🗝️ The Continental | Guest Services',
         description:
           'Of course. Discretion is our specialty.\n\n' +
-          'For private assistance, please use `/service` to contact Management.\n\n' +
+          'For private assistance, please use `/hotel service` to contact Management.\n\n' +
           'Your request will be delivered to the Service Desk.'
       }
     };
