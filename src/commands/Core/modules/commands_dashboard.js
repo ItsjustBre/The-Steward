@@ -216,18 +216,92 @@ export function buildOverviewComponents(guildId, snapshot) {
 }
 
 export function buildCategoryComponents(guildId, category) {
-  const toggleableCommands = category.commands.filter((command) => !command.protected);
+  const toggleableCommands = category.commands.filter(
+    (command) => !command.protected
+  );
+
   const commandOptions = toggleableCommands.slice(0, 25).map((command) => {
     const enabled = category.enabledCommands.includes(command.name);
+
     const label = command.isSubcommand
       ? command.name.replace(' ', ' · ').slice(0, 100)
       : command.name.slice(0, 100);
 
     return new StringSelectMenuOptionBuilder()
       .setLabel(label)
-      .setDescription((enabled ? '🟢 Enabled — click to disable' : '🔴 Disabled — click to enable').slice(0, 100))
+      .setDescription(
+        enabled
+          ? '🟢 Authorized — select to restrict'
+          : '🔴 Restricted — select to authorize'
+      )
       .setValue(command.name);
   });
+
+  const rows = [
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(customId(DASHBOARD_HOME, guildId))
+        .setLabel('Management Office')
+        .setEmoji('◀️')
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId(
+          customId(DASHBOARD_TOGGLE_CATEGORY, guildId, category.key)
+        )
+        .setLabel(
+          category.categoryDisabled
+            ? 'Authorize Dept.'
+            : 'Restrict Dept.'
+        )
+        .setEmoji(category.categoryDisabled ? '🟢' : '🔴')
+        .setStyle(
+          category.categoryDisabled
+            ? ButtonStyle.Success
+            : ButtonStyle.Danger
+        ),
+
+      new ButtonBuilder()
+        .setCustomId(
+          customId(DASHBOARD_ENABLE_ALL, guildId, category.key)
+        )
+        .setLabel('Authorize All')
+        .setEmoji('✅')
+        .setStyle(ButtonStyle.Success),
+
+      new ButtonBuilder()
+        .setCustomId(
+          customId(DASHBOARD_DISABLE_ALL, guildId, category.key)
+        )
+        .setLabel('Restrict All')
+        .setEmoji('⛔')
+        .setStyle(ButtonStyle.Danger),
+
+      new ButtonBuilder()
+        .setCustomId(
+          customId(DASHBOARD_RESET_COMMANDS, guildId, category.key)
+        )
+        .setLabel('Reset Permissions')
+        .setEmoji('🧹')
+        .setStyle(ButtonStyle.Secondary)
+    )
+  ];
+
+  if (commandOptions.length > 0) {
+    rows.unshift(
+      new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId(
+            customId(DASHBOARD_COMMAND_SELECT, guildId, category.key)
+          )
+          .setPlaceholder('🗝️ Select a command to manage...')
+          .addOptions(commandOptions)
+      )
+    );
+  }
+
+  return rows;
+}
 
   const rows = [
     new ActionRowBuilder().addComponents(
