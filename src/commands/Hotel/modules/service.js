@@ -43,9 +43,14 @@ export default {
     const details =
       interaction.fields.getTextInputValue('service_details');
 
-    const deskId = process.env.1568614792799850578;
+    // Management Service Desk channel
+    const deskId = process.env.SERVICE_DESK_CHANNEL_ID;
 
     if (!deskId) {
+      console.error(
+        '[THE STEWARD] SERVICE_DESK_CHANNEL_ID is not configured.'
+      );
+
       return interaction.reply({
         content: '🔔 The service desk is temporarily unavailable.',
         flags: MessageFlags.Ephemeral
