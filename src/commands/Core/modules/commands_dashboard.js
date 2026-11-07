@@ -118,15 +118,19 @@ export function buildOverviewEmbed(snapshot, guild) {
     ].join('\n'),
   });
 
-  return createEmbed({
-  title: '🗝️ THE STEWARD | COMMAND AUTHORITY',
+ return createEmbed({
+  title: `🗝️ THE STEWARD | ${category.displayName.toUpperCase()}`,
   description:
-    `**The B Continental — Management Office**\n\n` +
-    `Manage command permissions for **${guild.name}**.\n` +
-    `Select a department below to authorize or restrict its services.`,
-  color: 'primary',
+    `**The B Continental — Department Management**\n\n` +
+    `Review and manage access to the **${category.displayName}** department.\n` +
+    `Server: **${guild.name}**`,
+  color: category.categoryDisabled
+    ? 'error'
+    : category.disabledCount > 0
+      ? 'warning'
+      : 'success',
   fields,
-  footer: 'THE B CONTINENTAL • Authorized Management Only',
+  footer: 'THE B CONTINENTAL • Protected Commands Remain Available',
 });
 
 export function buildCategoryEmbed(category, guild) {
