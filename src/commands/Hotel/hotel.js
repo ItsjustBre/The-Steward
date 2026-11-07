@@ -5,6 +5,8 @@ import {
 } from 'discord.js';
 
 export default {
+  slashOnly: true,
+  category: 'Hotel',
   data: new SlashCommandBuilder()
     .setName('hotel')
     .setDescription('The B Continental — Guest Services')
