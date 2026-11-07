@@ -1,31 +1,46 @@
+
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('game')
-    .setDescription('Visit The B Continental Gaming Lounge.'),
+    .setDescription('Visit The B Continental Gaming Lounge'),
+
+  category: 'Hotel',
 
   async execute(interaction) {
     const embed = new EmbedBuilder()
-      .setColor('#C6A667')
-      .setTitle('🎮 THE B CONTINENTAL | GAMING LOUNGE')
+      .setColor(0xC8A96A)
+      .setTitle('🎮 THE B CONTINENTAL | Gaming Lounge')
       .setDescription(
-        'Welcome to the Gaming Lounge.\n\n' +
-        'A place where The Syndicate gathers to play, compete, and unwind.\n\n' +
-        '🎮 **Gaming Sessions**\n' +
-        'Find fellow members and organize multiplayer sessions.\n\n' +
-        '🏆 **Continental Tournaments**\n' +
-        'Compete in community challenges and special events.\n\n' +
-        '🥀 **Syndicate Game Nights**\n' +
-        'Join Don Bre and the family for community gaming.\n\n' +
-        '👑 **Capo VIP Sessions**\n' +
-        'Exclusive gaming experiences for eligible Capos.\n\n' +
-        '🗝️ **House Etiquette**\n' +
-        'Respect your fellow players. Competition is welcome; hostility is not.\n\n' +
-        '*Your next adventure begins here.*'
+        'Welcome to the Continental Gaming Lounge.\n\n' +
+        'Where The Syndicate comes together to play, compete, and unwind.\n\n' +
+        '*Every player has a seat at our table.*'
+      )
+      .addFields(
+        {
+          name: '🎮 Gaming Sessions',
+          value: 'Find fellow members and organize multiplayer adventures.'
+        },
+        {
+          name: '🏆 Continental Tournaments',
+          value: 'Community competitions, challenges, and special events.'
+        },
+        {
+          name: '🥀 Syndicate Game Nights',
+          value: 'Join Don Bre and the family for community gaming sessions.'
+        },
+        {
+          name: '👑 Capo VIP Experiences',
+          value: 'Special gaming opportunities and subscriber perks.'
+        },
+        {
+          name: '🗝️ House Etiquette',
+          value: 'Competition is encouraged. Respect is required.'
+        }
       )
       .setFooter({
-        text: 'THE STEWARD • Gaming Lounge'
+        text: 'The B Continental • Gaming Lounge'
       })
       .setTimestamp();
 
