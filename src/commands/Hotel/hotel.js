@@ -77,6 +77,7 @@ export default {
 
    const hotelCommands = {
   concierge: './concierge.js',
+  registry: './registry.js',
   amenities: './amenities.js',
   rules: './house-rules.js',
   service: './service.js'
