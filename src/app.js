@@ -1,9 +1,12 @@
-﻿import 'dotenv/config';
+import {
+  startContinentalWire,
+  stopContinentalWire
+} from './services/continentalWire/liveScheduler.js';
+import 'dotenv/config';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { REST } from '@discordjs/rest';
 import express from 'express';
 import cron from 'node-cron';
-
 import config from './config/application.js';
 import { initializeDatabase } from './utils/database.js';
 import { getGuildConfig } from './services/config/guildConfig.js';
