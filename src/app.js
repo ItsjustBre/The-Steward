@@ -16,21 +16,9 @@ import { initializeMusic } from './services/music/riffySetup.js';
 import { shutdownMusic } from './services/music/playerHandler.js';
 import pkg from '../package.json' with { type: 'json' };
 import { EXPECTED_SCHEMA_VERSION, EXPECTED_SCHEMA_LABEL } from './config/database/schemaVersion.js';
-
-import {
-  startContinentalWire,
-  stopContinentalWire
-} from './services/continentalWire/liveScheduler.js';
-
-import {
-  startYouTubeMonitor,
-  stopYouTubeMonitor
-} from './services/continentalWire/youtubeScheduler.js';
-
-import {
-  startKickMonitor,
-  stopKickMonitor
-} from './services/continentalWire/kickScheduler.js';
+import { startContinentalWire, stopContinentalWire } from './services/continentalWire/liveScheduler.js';
+import { startYouTubeMonitor, stopYouTubeMonitor } from './services/continentalWire/youtubeScheduler.js';
+import { startKickMonitor, stopKickMonitor } from './services/continentalWire/kickScheduler.js';
 
 class TitanBot extends Client {
   constructor() {
