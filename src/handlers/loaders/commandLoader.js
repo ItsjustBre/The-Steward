@@ -250,6 +250,7 @@ async function registerGlobalCommands(client, clientId, commands, totalSubcomman
     validateCommands(commands);
     logger.info('Command validation passed');
 
+    logger.warn(`HOTEL LOADED: ${client.commands.has('hotel') ? 'YES' : 'NO'}`);
     const commandsToRegister = prepareCommandsForRegistration(commands);
     logger.warn(`HOTEL CHECK: ${commandsToRegister.some(cmd => cmd.name === 'hotel') ? 'INCLUDED' : 'MISSING'}`);
     logger.warn(`HOTEL DEBUG: ${commandsToRegister.map(cmd => cmd.name).filter(name => ['hotel', 'concierge', 'amenities', 'house-rules'].includes(name)).join(', ') || 'NONE FOUND'}`);
