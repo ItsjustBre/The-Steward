@@ -251,6 +251,7 @@ async function registerGlobalCommands(client, clientId, commands, totalSubcomman
     logger.info('Command validation passed');
 
     const commandsToRegister = prepareCommandsForRegistration(commands);
+    logger.warn(`HOTEL CHECK: ${commandsToRegister.some(cmd => cmd.name === 'hotel') ? 'INCLUDED' : 'MISSING'}`);
     logger.warn(`HOTEL DEBUG: ${commandsToRegister.map(cmd => cmd.name).filter(name => ['hotel', 'concierge', 'amenities', 'house-rules'].includes(name)).join(', ') || 'NONE FOUND'}`);
 
     if (botConfig.commands?.deleteCommands) {
