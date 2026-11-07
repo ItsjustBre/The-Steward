@@ -6,29 +6,34 @@ import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName("ban")
-        .setDescription("Ban a user from the server")
+        .setName('ban')
+        .setDescription('Permanently revoke a guest’s access to The B Continental.')
         .addUserOption((option) =>
             option
-                .setName("target")
-                .setDescription("The user to ban")
+                .setName('target')
+                .setDescription('The guest whose access will be revoked.')
                 .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName("reason").setDescription("Reason for the ban"),
+            option
+                .setName('reason')
+                .setDescription('Reason for the disciplinary action.'),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
-    category: "moderation",
+
+    category: 'moderation',
 
     async execute(interaction, config, client) {
-        const user = interaction.options.getUser("target");
-        const reason = interaction.options.getString("reason") || "No reason provided";
+        const user = interaction.options.getUser('target');
+        const reason =
+            interaction.options.getString('reason') ||
+            'No reason provided';
 
         if (!user) {
             throw new TitanBotError(
                 'Missing target user',
                 ErrorTypes.USER_INPUT,
-                'You must specify a user to ban.',
+                'You must identify the guest whose access is being revoked.',
                 { subtype: 'invalid_user' },
             );
         }
@@ -37,14 +42,15 @@ export default {
             throw new TitanBotError(
                 'Cannot ban self',
                 ErrorTypes.VALIDATION,
-                'You cannot ban yourself.',
+                'You cannot revoke your own Continental access.',
             );
         }
+
         if (user.id === client.user.id) {
             throw new TitanBotError(
                 'Cannot ban bot',
                 ErrorTypes.VALIDATION,
-                'You cannot ban the bot.',
+                'The Steward cannot revoke its own access.',
             );
         }
 
@@ -58,8 +64,17 @@ export default {
         await InteractionHelper.universalReply(interaction, {
             embeds: [
                 successEmbed(
-                    `🚫 **Banned** ${user.tag}`,
-                    `**Reason:** ${reason}\n**Case ID:** #${result.caseId}`,
+                    '🚫 THE STEWARD | ACCESS REVOKED',
+                    [
+                        '**THE B CONTINENTAL — SECURITY OFFICE**',
+                        '',
+                        `**Guest:** ${user.tag}`,
+                        '**Status:** BANNED',
+                        `**Reason:** ${reason}`,
+                        `**Disciplinary Case:** #${result.caseId}`,
+                        '',
+                        '*Continental privileges have been revoked.*',
+                    ].join('\n'),
                 ),
             ],
         });
