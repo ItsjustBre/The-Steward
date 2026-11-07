@@ -513,31 +513,39 @@ export default {
             );
           }
 
-        } else if (
-  interaction.isModalSubmit() &&
-  interaction.customId === 'continental_service_request'
-) {
-  const service = await import(
-    '../commands/Hotel/modules/service.js'
-  );
+         } else if (interaction.isModalSubmit()) {
 
-  return await service.default.handleModal(interaction);
-}
-              if (
-                !interaction.replied &&
-                !interaction.deferred
-              ) {
+          // THE B CONTINENTAL — SERVICE DESK
+          if (
+            interaction.customId === 'continental_service_request'
+          ) {
+            try {
+              const service = await import(
+                '../commands/Hotel/modules/service.js'
+              );
+
+              await service.default.handleModal(interaction);
+
+            } catch (error) {
+              logger.error(
+                '[THE STEWARD] Service Desk modal error:',
+                { error }
+              );
+
+              if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply({
                   content:
-                    '🔔 The service desk encountered an error. Please contact Management.',
+                    '🔔 The Service Desk encountered an error. ' +
+                    'Please contact Management.',
                   flags: MessageFlags.Ephemeral
-                });
+                }).catch(() => {});
               }
             }
 
             return;
           }
 
+          // MODALS HANDLED BY THEIR OWN COLLECTORS
           if (
             interaction.customId.startsWith('app_review_') ||
             interaction.customId.startsWith('jtc_') ||
@@ -556,6 +564,7 @@ export default {
             return;
           }
 
+          // EXISTING BOT MODAL HANDLERS
           const [customId, ...args] =
             interaction.customId.split(':');
 
@@ -582,6 +591,7 @@ export default {
               client,
               args
             );
+
           } catch (error) {
             await handleInteractionError(
               interaction,
@@ -594,39 +604,3 @@ export default {
             );
           }
         }
-
-      } catch (error) {
-        logger.error('Unhandled error in interactionCreate:', {
-          event: 'interaction.unhandled_error',
-          errorCode: ErrorCodes.INTERACTION_UNHANDLED,
-          error,
-          traceId: interactionTraceContext.traceId,
-          interactionId: interaction.id,
-          guildId: interaction.guildId,
-          userId: interaction.user?.id
-        });
-
-        try {
-          await handleInteractionError(
-            interaction,
-            error,
-            withTraceContext({
-              type: 'interaction',
-              commandName: interaction.commandName,
-              customId: interaction.customId,
-              source: 'interactionCreate.unhandled'
-            }, interactionTraceContext)
-          );
-
-        } catch (replyError) {
-          logger.error('Failed to send fallback error response:', {
-            event: 'interaction.error_response_failed',
-            errorCode: ErrorCodes.INTERACTION_RESPONSE_FAILED,
-            error: replyError,
-            traceId: interactionTraceContext.traceId
-          });
-        }
-      }
-    });
-  }
-};
