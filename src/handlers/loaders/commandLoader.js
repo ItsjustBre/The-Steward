@@ -231,7 +231,25 @@ function prepareCommandsForRegistration(commands) {
     }
 
     logger.warn(`Command count (${commands.length}) exceeds Discord limit (${MAX_COMMANDS}), truncating...`);
-    const truncated = commands.slice(0, MAX_COMMANDS);
+    const continentalCommands = [
+  'hotel',
+  'checkin',
+  'registry',
+  'game',
+  'status',
+  'concierge',
+  'amenities',
+  'house-rules',
+  'service'
+];
+
+const prioritized = [...commands].sort((a, b) => {
+  const aPriority = continentalCommands.includes(a.name) ? 0 : 1;
+  const bPriority = continentalCommands.includes(b.name) ? 0 : 1;
+  return aPriority - bPriority;
+});
+
+const truncated = prioritized.slice(0, MAX_COMMANDS);
     logger.info(`Truncated to ${truncated.length} commands for registration`);
     return truncated;
 }
