@@ -1,34 +1,45 @@
-import { SlashCommandBuilder, PermissionFlagsBits, PermissionsBitField, ChannelType, MessageFlags } from 'discord.js';
-import { createEmbed, errorEmbed, successEmbed, infoEmbed, warningEmbed } from '../../utils/embeds.js';
+import {
+    SlashCommandBuilder,
+    PermissionFlagsBits,
+    MessageFlags
+} from 'discord.js';
+
+import { successEmbed } from '../../utils/embeds.js';
 import { logModerationAction } from '../../utils/moderation.js';
 import { logger } from '../../utils/logger.js';
 import { WarningService } from '../../services/moderation/warningService.js';
 import { ModerationService } from '../../services/moderation/moderationService.js';
 import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
+
 export default {
     data: new SlashCommandBuilder()
-        .setName("warn")
-        .setDescription("Warn a user")
-        .addUserOption((o) =>
-            o
-                .setName("target")
+        .setName('warn')
+        .setDescription('Issue a formal disciplinary warning to a Continental guest.')
+        .addUserOption(option =>
+            option
+                .setName('target')
+                .setDescription('The guest receiving the formal warning.')
                 .setRequired(true)
-                .setDescription("User to warn"),
         )
-        .addStringOption((o) =>
-            o
-                .setName("reason")
+        .addStringOption(option =>
+            option
+                .setName('reason')
+                .setDescription('The Continental Protocol violation or warning reason.')
                 .setRequired(true)
-                .setDescription("Reason for the warning"),
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
-    category: "moderation",
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+        .setDMPermission(false),
+
+    category: 'moderation',
 
     async execute(interaction, config, client) {
-        const deferSuccess = await InteractionHelper.safeDefer(interaction);
+        const deferSuccess = await InteractionHelper.safeDefer(interaction, {
+            flags: MessageFlags.Ephemeral
+        });
+
         if (!deferSuccess) {
-            logger.warn(`Warn interaction defer failed`, {
+            logger.warn('Steward warning interaction defer failed', {
                 userId: interaction.user.id,
                 guildId: interaction.guildId,
                 commandName: 'warn'
@@ -36,9 +47,9 @@ export default {
             return;
         }
 
-        const target = interaction.options.getUser("target");
-        const member = interaction.options.getMember("target");
-        const reason = interaction.options.getString("reason");
+        const target = interaction.options.getUser('target');
+        const member = interaction.options.getMember('target');
+        const reason = interaction.options.getString('reason');
         const moderator = interaction.user;
         const guildId = interaction.guildId;
 
@@ -46,29 +57,33 @@ export default {
             throw new TitanBotError(
                 'Missing target user',
                 ErrorTypes.USER_INPUT,
-                'You must specify a user to warn.',
-                { subtype: 'invalid_user' },
+                'You must identify the guest receiving the warning.',
+                { subtype: 'invalid_user' }
             );
         }
 
-        if (!reason) {
+        if (!reason?.trim()) {
             throw new TitanBotError(
                 'Missing warning reason',
                 ErrorTypes.VALIDATION,
-                'You must provide a reason for the warning.',
-                { subtype: 'missing_required' },
+                'Every formal warning must include a reason.',
+                { subtype: 'missing_required' }
             );
         }
 
         if (!member) {
             throw new TitanBotError(
-                "Target not found",
+                'Target not found',
                 ErrorTypes.USER_INPUT,
-                "The target user is not currently in this server."
+                'This guest is not currently registered in the Continental.'
             );
         }
 
-        ModerationService.assertModerationHierarchy(interaction.member, member, 'warn');
+        ModerationService.assertModerationHierarchy(
+            interaction.member,
+            member,
+            'warn'
+        );
 
         const { id, totalCount } = await WarningService.addWarning({
             guildId,
@@ -82,7 +97,7 @@ export default {
             client,
             guild: interaction.guild,
             event: {
-                action: "User Warned",
+                action: 'User Warned',
                 target: `${target.tag} (${target.id})`,
                 executor: `${moderator.tag} (${moderator.id})`,
                 reason,
@@ -99,10 +114,20 @@ export default {
         await InteractionHelper.safeEditReply(interaction, {
             embeds: [
                 successEmbed(
-                    `⚠️ **Warned** ${target.tag}`,
-                    `**Reason:** ${reason}\n**Total Warns:** ${totalCount}`,
-                ),
-            ],
+                    '⚠️ THE STEWARD | FORMAL WARNING ISSUED',
+                    [
+                        '**THE B CONTINENTAL — DISCIPLINARY OFFICE**',
+                        '',
+                        `**Guest:** ${target.tag}`,
+                        '**Disciplinary Action:** FORMAL WARNING',
+                        `**Violation / Reason:** ${reason}`,
+                        `**Total Warnings:** ${totalCount}`,
+                        `**Warning Record:** #${id}`,
+                        '',
+                        '*This incident has been entered into the Continental disciplinary records.*'
+                    ].join('\n')
+                )
+            ]
         });
     }
 };
