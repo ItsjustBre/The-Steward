@@ -82,10 +82,9 @@ export default {
   concierge: './modules/concierge.js',
   registry: './modules/registry.js',
   amenities: './modules/amenities.js',
-  rules: './house-rules.js',
+  rules: './modules/house-rules.js',
   service: './service.js'
 };
-
       if (hotelCommands[command]) {
         const module = await import(hotelCommands[command]);
         return await module.default.execute(interaction);
