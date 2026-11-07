@@ -16,10 +16,23 @@ export default {
     )
 
     .addSubcommand(sub =>
-      sub
-        .setName('concierge')
-        .setDescription('Ask The Concierge for assistance')
+  sub
+    .setName('concierge')
+    .setDescription('Your personal guide to The B Continental')
+    .addStringOption(option =>
+      option
+        .setName('assistance')
+        .setDescription('How may The Concierge assist you?')
+        .setRequired(true)
+        .addChoices(
+          { name: '🏨 Hotel Directory', value: 'directory' },
+          { name: '🎮 Gaming Lounge', value: 'gaming' },
+          { name: '💄 Beauty Suite', value: 'beauty' },
+          { name: '🥂 Lifestyle Salon', value: 'lifestyle' },
+          { name: '🗝️ Guest Services', value: 'services' }
+        )
     )
+)
 
     .addSubcommand(sub =>
       sub
@@ -62,11 +75,12 @@ export default {
   async execute(interaction) {
     const command = interaction.options.getSubcommand();
 
-    const hotelCommands = {
-      amenities: './amenities.js',
-      rules: './house-rules.js',
-      service: './service.js'
-    };
+   const hotelCommands = {
+  concierge: './concierge.js',
+  amenities: './amenities.js',
+  rules: './house-rules.js',
+  service: './service.js'
+};
 
     if (hotelCommands[command]) {
       const module = await import(hotelCommands[command]);
