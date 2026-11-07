@@ -513,24 +513,16 @@ export default {
             );
           }
 
-        } else if (interaction.isModalSubmit()) {
-          if (
-            interaction.customId ===
-            'continental_service_request'
-          ) {
-            try {
-              const service = await import(
-                '../commands/Hotel/service.js'
-              );
+        } else if (
+  interaction.isModalSubmit() &&
+  interaction.customId === 'continental_service_request'
+) {
+  const service = await import(
+    '../commands/Hotel/modules/service.js'
+  );
 
-              await service.default.handleModal(interaction);
-
-            } catch (error) {
-              logger.error(
-                'Continental Service Desk error:',
-                error
-              );
-
+  return await service.default.handleModal(interaction);
+}
               if (
                 !interaction.replied &&
                 !interaction.deferred
