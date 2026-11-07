@@ -83,7 +83,8 @@ export default {
   registry: './modules/registry.js',
   amenities: './modules/amenities.js',
   rules: './modules/house-rules.js',
-  service: './modules/service.js'
+  service: './modules/service.js',
+  status: '/modules/status.js
 };
       if (hotelCommands[command]) {
         const module = await import(hotelCommands[command]);
