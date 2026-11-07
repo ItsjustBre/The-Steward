@@ -364,11 +364,9 @@ class TitanBot extends Client {
       )
     );
 
-    // 🏨 THE CONTINENTAL WIRE
-    // Disabled until we finish testing.
-    // Uncomment the line below to activate monitoring.
-
-   startContinentalWire(this);
+    // THE CONTINENTAL WIRE
+    // Twitch and YouTube monitoring enabled.
+    startContinentalWire(this);
     startYouTubeMonitor(this);
   }
 
@@ -544,8 +542,9 @@ class TitanBot extends Client {
 
       logger.info('✅ Cron jobs stopped');
 
-      // 🏨 Stop Continental Wire monitoring
+      // Stop Twitch and YouTube monitoring
       stopContinentalWire();
+      stopYouTubeMonitor();
 
       logger.info(
         '✅ Continental Wire stopped'
@@ -691,7 +690,6 @@ try {
   };
 
   setupShutdown();
-  stopYouTubeMonitor();
 
   bot.start().catch((error) => {
     logger.error(
