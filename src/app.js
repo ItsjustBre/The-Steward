@@ -27,6 +27,11 @@ import {
   stopYouTubeMonitor
 } from './services/continentalWire/youtubeScheduler.js';
 
+import {
+  startKickMonitor,
+  stopKickMonitor
+} from './services/continentalWire/kickScheduler.js';
+
 class TitanBot extends Client {
   constructor() {
     super({
@@ -365,10 +370,11 @@ class TitanBot extends Client {
     );
 
     // THE CONTINENTAL WIRE
-    // Twitch and YouTube monitoring enabled.
-    startContinentalWire(this);
-    startYouTubeMonitor(this);
-  }
+// Twitch, YouTube and Kick monitoring
+startContinentalWire(this);
+startYouTubeMonitor(this);
+startKickMonitor(this);
+
 
   async updateAllCounters() {
     if (!this.db) {
@@ -542,9 +548,10 @@ class TitanBot extends Client {
 
       logger.info('✅ Cron jobs stopped');
 
-      // Stop Twitch and YouTube monitoring
-      stopContinentalWire();
-      stopYouTubeMonitor();
+      // Stop all Continental Wire monitors
+stopContinentalWire();
+stopYouTubeMonitor();
+stopKickMonitor();
 
       logger.info(
         '✅ Continental Wire stopped'
