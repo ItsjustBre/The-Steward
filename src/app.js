@@ -22,6 +22,11 @@ import {
   stopContinentalWire
 } from './services/continentalWire/liveScheduler.js';
 
+import {
+  startYouTubeMonitor,
+  stopYouTubeMonitor
+} from './services/continentalWire/youtubeScheduler.js';
+
 class TitanBot extends Client {
   constructor() {
     super({
