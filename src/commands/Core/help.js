@@ -1,181 +1,156 @@
 import {
-    SlashCommandBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} from "discord.js";
-import { InteractionHelper } from '../../utils/interactionHelper.js';
-import { createEmbed } from "../../utils/embeds.js";
-import {
-    createSelectMenu,
-} from "../../utils/components.js";
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  MessageFlags
+} from 'discord.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { createEmbed } from '../../utils/embeds.js';
 
-const CATEGORY_SELECT_ID = "help-category-select";
-const ALL_COMMANDS_ID = "help-all-commands";
-const BUG_REPORT_BUTTON_ID = "help-bug-report";
-const HELP_MENU_TIMEOUT_MS = 5 * 60 * 1000;
-
-const CATEGORY_ICONS = {
-    Core: "ℹ️",
-    Moderation: "🛡️",
-    Economy: "💰",
-    Music: "🎵",
-    Fun: "🎮",
-    Leveling: "📊",
-    Utility: "🔧",
-    Ticket: "🎫",
-    Welcome: "👋",
-    Giveaway: "🎉",
-    Counter: "🔢",
-    Tools: "🛠️",
-    Search: "🔍",
-    "Reaction Roles": "🎭",
-    Community: "👥",
-    Birthday: "🎂",
-    "Join To Create": "🔌",
-    Verification: "✅",
+const DIRECTORY = {
+  arrival: {
+    title: '🏨 The Front Desk',
+    description:
+      '**`/checkin`** — Begin your stay at The B Continental.\n' +
+      '**`/hotel`** — Explore the Continental.\n' +
+      '**`/registry`** — Access the guest registry.'
+  },
+  services: {
+    title: '🛎️ Guest Services',
+    description:
+      '**`/service`** — Submit a guest service request.\n' +
+      '**`/concierge`** — Contact the Concierge.\n' +
+      '**`/support`** — Guest assistance.'
+  },
+  amenities: {
+    title: '🥂 Hotel Amenities',
+    description:
+      '**`/amenities`** — Explore the hotel amenities.\n' +
+      '**`/game`** — Gaming services and activities.'
+  },
+  policies: {
+    title: '📜 Continental Protocol',
+    description:
+      '**`/house-rules`** — Review hotel policies.'
+  },
+  management: {
+    title: '🗝️ Management Office',
+    description:
+      '**`/configwizard`** — Configure server settings.\n' +
+      '**`/commands dashboard`** — Manage commands.\n' +
+      '**`/stats`** — System intelligence.'
+  }
 };
 
-function formatCategoryName(rawCategory) {
-    return rawCategory
-        .replace(/_/g, '')
-        .replace(/([a-z])([A-Z])/g, '$1 $2')
-        .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
 export async function createInitialHelpMenu(client) {
-    const commandsPath = path.join(__dirname, "../../commands");
-    const categoryDirs = (
-        await fs.readdir(commandsPath, { withFileTypes: true })
-    )
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name)
-        .sort();
+  const embed = createEmbed({
+    title: '🗝️ THE B CONTINENTAL | GUEST DIRECTORY',
+    description:
+      'Welcome to The B Continental.\n\n' +
+      'A sanctuary for The Syndicate, where every guest ' +
+      'is family and discretion is our tradition.\n\n' +
+      'Select a department below to explore its services.',
+    color: 'primary',
+    thumbnail: client?.user?.displayAvatarURL?.({ size: 1024 })
+  });
 
-    const options = [
-        {
-            label: "📋 All Commands",
-            description: "Browse every available command in a single list",
-            value: ALL_COMMANDS_ID,
-        },
-        ...categoryDirs.map((category) => {
-            const categoryName = formatCategoryName(category);
-            const icon = CATEGORY_ICONS[categoryName] || "🔍";
-            return {
-                label: `${icon} ${categoryName}`,
-                description: `View commands in the ${categoryName} category`,
-                value: category,
-            };
-        }),
-    ];
+  embed.setFooter({
+    text: 'THE B CONTINENTAL • By Order of Don Bre'
+  });
 
-    const botName = client?.user?.username || "Bot";
-    const embed = createEmbed({
-        title: `📖 ${botName} Help`,
-        description: 'Set up your server, pick what to enable, then browse commands below.',
-        color: 'primary',
-        thumbnail: client.user?.displayAvatarURL?.({ size: 1024 }),
-        fields: [
-            {
-                name: '🚀 Getting Started',
-                value: [
-                    '**1. Launch setup** — Run `/configwizard` to configure prefix, mod role, and logs.',
-                    '**2. Enable systems** — Use `/commands dashboard` to turn categories on or off.',                    '**3. Browse commands** — Use the menu below to view categories and commands.',
-                ].join('\n'),
-                inline: false,
-            },
-            {
-                name: 'ℹ️ How It Works',
-                value: [
-                    '• Dashboard commands manage each feature visually',
-                    '• Settings are saved per server',
-                    '• Slash commands and prefixes both work once enabled',
-                ].join('\n'),
-                inline: false,
-            },
-            {
-                name: '\u200B',
-                value: `-# ${botName} is [open source](https://youtu.be/1jCZX8s3bJE?si=NPOYx-vxVE1I5vJK)`,
-                inline: false,
-            },
-        ],
-    });
-
-    embed.setFooter({ 
-        text: "Made with ❤️" 
-    });
-    embed.setTimestamp();
-
-    const bugReportButton = new ButtonBuilder()
-        .setCustomId(BUG_REPORT_BUTTON_ID)
-        .setLabel("Report Bug")
-        .setStyle(ButtonStyle.Danger);
-
-    const supportButton = new ButtonBuilder()
-        .setLabel("Support Server")
-        .setURL("https://discord.gg/QnWNz2dKCE")
-        .setStyle(ButtonStyle.Link);
-
-    const selectRow = createSelectMenu(
-        CATEGORY_SELECT_ID,
-        "Select to view the commands",
-        options,
-    );
-
-    const buttonRow = new ActionRowBuilder().addComponents([
-        bugReportButton,
-        supportButton,
+  const menu = new StringSelectMenuBuilder()
+    .setCustomId('continental-directory')
+    .setPlaceholder('🗝️ Choose a department')
+    .addOptions([
+      {
+        label: 'The Front Desk',
+        value: 'arrival',
+        emoji: '🏨'
+      },
+      {
+        label: 'Guest Services',
+        value: 'services',
+        emoji: '🛎️'
+      },
+      {
+        label: 'Hotel Amenities',
+        value: 'amenities',
+        emoji: '🥂'
+      },
+      {
+        label: 'Continental Protocol',
+        value: 'policies',
+        emoji: '📜'
+      },
+      {
+        label: 'Management Office',
+        value: 'management',
+        emoji: '🗝️'
+      }
     ]);
 
-    return {
-        embeds: [embed],
-        components: [buttonRow, selectRow],
-    };
+  return {
+    embeds: [embed],
+    components: [
+      new ActionRowBuilder().addComponents(menu)
+    ]
+  };
 }
 
 export default {
-    slashOnly: true,
-    data: new SlashCommandBuilder()
-        .setName("help")
-        .setDescription("Displays the help menu with all available commands"),
+  slashOnly: true,
+  category: 'Core',
 
-    async execute(interaction, guildConfig, client) {
-        
-        const { MessageFlags } = await import('discord.js');
-        await InteractionHelper.safeDefer(interaction);
-        
-        const { embeds, components } = await createInitialHelpMenu(client);
+  data: new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Explore The B Continental guest directory'),
 
-        await InteractionHelper.safeEditReply(interaction, {
-            embeds,
-            components,
-        });
+  async execute(interaction) {
+    const { embeds, components } =
+      await createInitialHelpMenu(interaction.client);
 
-        setTimeout(async () => {
-            try {
-                if (!InteractionHelper.isInteractionValid(interaction)) {
-                    return;
-                }
+    const response = await interaction.reply({
+      embeds,
+      components,
+      flags: MessageFlags.Ephemeral,
+      withResponse: true
+    });
 
-                const closedEmbed = createEmbed({
-                    title: "Help menu closed",
-                    description: "Help menu has been closed, use /help again.",
-                    color: "secondary",
-                });
+    const message = response.resource?.message;
 
-                await InteractionHelper.safeEditReply(interaction, {
-                    embeds: [closedEmbed],
-                    components: [],
-                });
-            } catch (error) {
-                logger.debug('Help menu close edit failed (interaction may have expired):', error?.message);
-            }
-        }, HELP_MENU_TIMEOUT_MS);
-    },
+    if (!message) return;
+
+    const collector = message.createMessageComponentCollector({
+      filter: i =>
+        i.customId === 'continental-directory' &&
+        i.user.id === interaction.user.id,
+      time: 300000
+    });
+
+    collector.on('collect', async i => {
+      const department = DIRECTORY[i.values[0]];
+      if (!department) return;
+
+      const embed = createEmbed({
+        title: department.title,
+        description: department.description,
+        color: 'primary'
+      });
+
+      embed.setFooter({
+        text: 'THE B CONTINENTAL • Guest Directory'
+      });
+
+      await i.update({
+        embeds: [embed],
+        components
+      });
+    });
+
+    collector.on('end', async () => {
+      await interaction.editReply({
+        components: []
+      }).catch(() => {});
+    });
+  }
 };
