@@ -43,7 +43,7 @@ export default {
     const details =
       interaction.fields.getTextInputValue('service_details');
 
-    const deskId = process.env.SERVICE_DESK_CHANNEL_ID;
+    const deskId = process.env.1568614792799850578;
 
     if (!deskId) {
       return interaction.reply({
