@@ -56,21 +56,20 @@ export default {
     .setColor('#692F3A')
     .setTitle('🥀 THE B CONTINENTAL | GUEST CHECK-IN')
     .setDescription(welcomeMessage)
-    .setThumbnail(user.displayAvatarURL({ size: 256 }))
     .addFields(
         {
-            name: '🗝️ Your Reservation',
-            value: `Guest: ${user.toString()}\nReservation No. ${guild.memberCount}`,
+            name: '🗝️ Guest Registration',
+            value: `**Guest:** ${user.toString()}\n**Member No.:** ${guild.memberCount}`,
             inline: false
         },
         {
             name: '📜 The House Code',
-            value: 'Respect the house. Honor the family.',
+            value: 'Know the rules. Respect the family.',
             inline: true
         },
         {
             name: '🎭 The Outfit',
-            value: 'Select your interests and find your place.',
+            value: 'Choose your interests and claim your place.',
             inline: true
         }
     )
@@ -79,34 +78,13 @@ export default {
     })
     .setTimestamp();
 
-if (welcomeConfig.welcomeImage) {
-    embed.setImage(welcomeConfig.welcomeImage);
-} else if (welcomeConfig.welcomeEmbed?.image?.url) {
-    embed.setImage(welcomeConfig.welcomeEmbed.image.url);
-}
-        
-        if (config?.verification?.enabled || config?.verification?.autoVerify?.enabled) {
-            await handleVerification(member, guild, config.verification, member.client);
-        }
-
-        try {
-            await logEvent({
-                client: member.client,
-                guildId: guild.id,
-                eventType: EVENT_TYPES.MEMBER_JOIN,
-                data: {
-                    title: 'User joined',
-                    lines: [
-                        `**User:** ${user.toString()} (${user.displayName !== user.username ? `@${user.displayName}` : user.tag})`,
-                        `**ID:** \`${user.id}\``,
-                        `**Created:** <t:${Math.floor(user.createdTimestamp / 1000)}:R>`,
-                        `**Members:** ${guild.memberCount}`,
-                    ],
-                    quoted: false,
-                    thumbnail: user.displayAvatarURL({ dynamic: true }),
-                    userId: user.id,
-                }
-            });
+await channel.send({
+    content: messageContent,
+    embeds: [embed],
+    allowedMentions: {
+        users: welcomeConfig.welcomePing ? [user.id] : []
+    }
+});
         } catch (error) {
             logger.debug('Error logging member join:', error);
         }
