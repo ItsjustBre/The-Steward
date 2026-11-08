@@ -490,6 +490,40 @@ export default {
 
         if (interaction.isButton()) {
 
+           // ==========================================
+          // THE B CONTINENTAL — SETUP BUTTONS
+          // ==========================================
+
+          if (interaction.customId.startsWith('continental:')) {
+
+            try {
+
+              const command = client.commands.get('setupcontinental');
+
+              if (!command?.handleButton) {
+                throw new Error(
+                  'setupcontinental command or handleButton is not registered'
+                );
+              }
+
+              await command.handleButton(interaction);
+
+            } catch (error) {
+
+              await handleInteractionError(
+                interaction,
+                error,
+                withTraceContext({
+                  type: 'button',
+                  customId: interaction.customId,
+                  handler: 'continental_setup'
+                }, traceContext)
+              );
+            }
+
+            return;
+          }
+
           if (interaction.customId.startsWith('shared_todo_')) {
 
             const parts = interaction.customId.split('_');
