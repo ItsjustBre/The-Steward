@@ -1,6 +1,11 @@
 import { Events, MessageFlags } from 'discord.js';
 
-import { logger } from '../utils/logger.js';
+import {
+  logger,
+  createInteractionTraceContext,
+  runWithTraceContext
+} from '../utils/logger.js';
+
 import { getGuildConfig } from '../services/config/guildConfig.js';
 
 import {
@@ -20,11 +25,6 @@ import {
 } from '../utils/errorHandler.js';
 
 import { InteractionHelper } from '../utils/interactionHelper.js';
-
-import {
-  createInteractionTraceContext,
-  runWithTraceContext
-} from '../utils/logger.js';
 
 import {
   validateChatInputPayloadOrThrow
@@ -55,7 +55,6 @@ import {
   enforceDefaultCommandPermissions
 } from '../utils/permissionGuard.js';
 
-
 const COMMAND_ERROR_SUBTYPES = {
   warn: 'warn_failed',
   kick: 'kick_failed',
@@ -72,7 +71,6 @@ const COMMAND_ERROR_SUBTYPES = {
   greroll: 'giveaway_failed'
 };
 
-
 function withTraceContext(context = {}, traceContext = {}) {
   return {
     traceId: traceContext.traceId,
@@ -83,21 +81,17 @@ function withTraceContext(context = {}, traceContext = {}) {
   };
 }
 
-
 export default {
   name: Events.InteractionCreate,
 
   async execute(interaction, client) {
-
     const traceContext = createInteractionTraceContext(interaction);
 
     interaction.traceContext = traceContext;
     interaction.traceId = traceContext.traceId;
 
     return runWithTraceContext(traceContext, async () => {
-
       try {
-
         InteractionHelper.patchInteractionResponses(interaction);
         ResponseCoordinator.attach(interaction);
 
@@ -106,9 +100,7 @@ export default {
         // ==========================================
 
         if (interaction.isChatInputCommand()) {
-
           try {
-
             logger.info(
               `Command executed: /${interaction.commandName} by ${interaction.user.tag}`,
               {
@@ -178,14 +170,12 @@ export default {
               defaultCooldownSec > 0 &&
               !isBotOwner(interaction.user.id)
             ) {
-
               const cooldownKey =
                 `${interaction.user.id}:${interaction.commandName}`;
 
               const expiresAt = client.cooldowns.get(cooldownKey);
 
               if (expiresAt && Date.now() < expiresAt) {
-
                 const remainingSec = Math.ceil(
                   (expiresAt - Date.now()) / 1000
                 );
@@ -218,7 +208,6 @@ export default {
             );
 
             if (!abuseProtection.allowed) {
-
               const formattedCooldown = formatCooldownDuration(
                 abuseProtection.remainingMs
               );
@@ -243,7 +232,6 @@ export default {
             let guildConfig = null;
 
             if (interaction.guild) {
-
               guildConfig = await getGuildConfig(
                 client,
                 interaction.guild.id,
@@ -297,7 +285,6 @@ export default {
             );
 
           } catch (error) {
-
             await handleInteractionError(
               interaction,
               error,
@@ -319,20 +306,17 @@ export default {
         // ==========================================
 
         if (interaction.isAutocomplete()) {
-
           const autocompleteCommand = client.commands.get(
             interaction.commandName
           );
 
           if (autocompleteCommand?.autocomplete) {
-
             try {
               await autocompleteCommand.autocomplete(
                 interaction,
                 client
               );
             } catch (error) {
-
               logger.error(
                 'Error handling command autocomplete:',
                 {
@@ -355,9 +339,7 @@ export default {
             interaction.commandName === 'reactroles' &&
             focusedOption.name === 'panel'
           ) {
-
             try {
-
               const {
                 getAllReactionRoleMessages,
                 deleteReactionRoleMessage
@@ -381,7 +363,6 @@ export default {
               const validPanels = [];
 
               for (const panel of panels) {
-
                 if (!panel.messageId || !panel.channelId) {
                   continue;
                 }
@@ -391,7 +372,6 @@ export default {
                 );
 
                 if (!channel) {
-
                   await deleteReactionRoleMessage(
                     client,
                     guildId,
@@ -406,7 +386,6 @@ export default {
                 ).catch(() => null);
 
                 if (!msg) {
-
                   await deleteReactionRoleMessage(
                     client,
                     guildId,
@@ -426,9 +405,7 @@ export default {
 
               const choices = await Promise.all(
                 validPanels.slice(0, 25).map(async panel => {
-
                   try {
-
                     const channel = guild.channels.cache.get(
                       panel.channelId
                     );
@@ -464,7 +441,6 @@ export default {
               );
 
             } catch (error) {
-
               logger.error(
                 'Error handling reactroles autocomplete:',
                 {
@@ -490,26 +466,37 @@ export default {
 
         if (interaction.isButton()) {
 
-           // ==========================================
-          // THE B CONTINENTAL — SETUP BUTTONS
+          // ==========================================
+          // THE B CONTINENTAL — SETUP BUTTON HANDLER
           // ==========================================
 
-          if (interaction.customId.startsWith('continental:')) {
-
+          if (
+            interaction.customId.startsWith('continental:')
+          ) {
             try {
+              const setupCommand = client.commands.get(
+                'setupcontinental'
+              );
 
-              const command = client.commands.get('setupcontinental');
-
-              if (!command?.handleButton) {
-                throw new Error(
-                  'setupcontinental command or handleButton is not registered'
+              if (
+                !setupCommand ||
+                typeof setupCommand.handleButton !== 'function'
+              ) {
+                throw createError(
+                  'Continental setup command handler not found.',
+                  ErrorTypes.CONFIGURATION,
+                  'The Continental setup system is unavailable.',
+                  withTraceContext({
+                    type: 'button',
+                    customId: interaction.customId,
+                    handler: 'continental_setup'
+                  }, traceContext)
                 );
               }
 
-              await command.handleButton(interaction);
+              await setupCommand.handleButton(interaction);
 
             } catch (error) {
-
               await handleInteractionError(
                 interaction,
                 error,
@@ -524,8 +511,13 @@ export default {
             return;
           }
 
-          if (interaction.customId.startsWith('shared_todo_')) {
+          // ==========================================
+          // SHARED TODO BUTTONS
+          // ==========================================
 
+          if (
+            interaction.customId.startsWith('shared_todo_')
+          ) {
             const parts = interaction.customId.split('_');
             const buttonType = parts.slice(0, 3).join('_');
             const listId = parts[3];
@@ -533,15 +525,14 @@ export default {
             const button = client.buttons.get(buttonType);
 
             if (button) {
-
               try {
                 await button.execute(
                   interaction,
                   client,
                   [listId]
                 );
-              } catch (error) {
 
+              } catch (error) {
                 await handleInteractionError(
                   interaction,
                   error,
@@ -554,7 +545,6 @@ export default {
               }
 
             } else {
-
               throw createError(
                 `No button handler found for ${buttonType}`,
                 ErrorTypes.CONFIGURATION,
@@ -568,13 +558,16 @@ export default {
             return;
           }
 
+          // ==========================================
+          // GENERAL BUTTON HANDLERS
+          // ==========================================
+
           const [customId, ...args] =
             interaction.customId.split(':');
 
           const button = client.buttons.get(customId);
 
           if (!button) {
-
             if (
               !interaction.customId.includes(':') ||
               isCollectorManagedComponent(customId)
@@ -593,7 +586,6 @@ export default {
           }
 
           try {
-
             await button.execute(
               interaction,
               client,
@@ -601,7 +593,6 @@ export default {
             );
 
           } catch (error) {
-
             await handleInteractionError(
               interaction,
               error,
@@ -621,14 +612,12 @@ export default {
         // ==========================================
 
         if (interaction.isStringSelectMenu()) {
-
           const [customId, ...args] =
             interaction.customId.split(':');
 
           const selectMenu = client.selectMenus.get(customId);
 
           if (!selectMenu) {
-
             if (
               !interaction.customId.includes(':') ||
               isCollectorManagedComponent(customId)
@@ -647,7 +636,6 @@ export default {
           }
 
           try {
-
             await selectMenu.execute(
               interaction,
               client,
@@ -655,7 +643,6 @@ export default {
             );
 
           } catch (error) {
-
             await handleInteractionError(
               interaction,
               error,
@@ -675,15 +662,15 @@ export default {
 
         if (interaction.isModalSubmit()) {
 
+          // ==========================================
           // THE B CONTINENTAL — SERVICE DESK
+          // ==========================================
 
           if (
             interaction.customId ===
             'continental_service_request'
           ) {
-
             try {
-
               const service = await import(
                 '../commands/Hotel/modules/service.js'
               );
@@ -691,7 +678,6 @@ export default {
               await service.default.handleModal(interaction);
 
             } catch (error) {
-
               logger.error(
                 '[THE STEWARD] Service Desk modal error:',
                 { error }
@@ -701,7 +687,6 @@ export default {
                 !interaction.replied &&
                 !interaction.deferred
               ) {
-
                 await interaction.reply({
                   content:
                     '🔔 The Service Desk encountered an error. ' +
@@ -714,7 +699,9 @@ export default {
             return;
           }
 
+          // ==========================================
           // COLLECTOR-MANAGED MODALS
+          // ==========================================
 
           if (
             interaction.customId.startsWith('app_review_') ||
@@ -723,7 +710,6 @@ export default {
             interaction.customId.startsWith('log_dash_channel_modal:') ||
             interaction.customId.startsWith('log_dash_filter_modal:')
           ) {
-
             logger.debug(
               `Skipping modal handler lookup for inline-awaited modal: ${interaction.customId}`,
               {
@@ -735,7 +721,9 @@ export default {
             return;
           }
 
+          // ==========================================
           // GENERAL MODAL HANDLERS
+          // ==========================================
 
           const [customId, ...args] =
             interaction.customId.split(':');
@@ -743,7 +731,6 @@ export default {
           const modal = client.modals.get(customId);
 
           if (!modal) {
-
             if (!interaction.customId.includes(':')) {
               return;
             }
@@ -759,7 +746,6 @@ export default {
           }
 
           try {
-
             await modal.execute(
               interaction,
               client,
@@ -767,7 +753,6 @@ export default {
             );
 
           } catch (error) {
-
             await handleInteractionError(
               interaction,
               error,
@@ -802,7 +787,6 @@ export default {
         );
 
         try {
-
           await handleInteractionError(
             interaction,
             error,
@@ -815,7 +799,6 @@ export default {
           );
 
         } catch (replyError) {
-
           logger.error(
             'Failed to send fallback error response:',
             {
