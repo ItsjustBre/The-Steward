@@ -154,6 +154,7 @@ function findCategory(guild, name) {
   );
 }
 
+
 function findExisting(guild, category, name) {
   return guild.channels.cache.find(channel =>
     channel.parentId === category.id &&
