@@ -52,53 +52,38 @@ export default {
                         content: messageContent || welcomeMessage
                     });
                 } else {
-                    const embed = new EmbedBuilder()
-                        .setColor(welcomeConfig.welcomeEmbed?.color || getColor('success'))
-                        .setTitle(embedTitle)
-                        .setDescription(welcomeMessage)
-                        .setThumbnail(user.displayAvatarURL())
-                        .addFields(
-                            { name: 'User', value: `${user.tag} (${user.id})`, inline: true },
-                            { name: 'Member Count', value: guild.memberCount.toString(), inline: true }
-                        )
-                        .setTimestamp()
-                        .setFooter({ text: embedFooter });
-                    
-                    if (welcomeConfig.welcomeImage) {
-                        embed.setImage(welcomeConfig.welcomeImage);
-                    } else if (welcomeConfig.welcomeEmbed?.image?.url) {
-                        embed.setImage(welcomeConfig.welcomeEmbed.image.url);
-                    }
-                    
-                    await channel.send({ 
-                        content: messageContent,
-                        embeds: [embed] 
-                    });
-                }
-            }
+                   const embed = new EmbedBuilder()
+    .setColor('#692F3A')
+    .setTitle('🥀 THE B CONTINENTAL | GUEST CHECK-IN')
+    .setDescription(welcomeMessage)
+    .setThumbnail(user.displayAvatarURL({ size: 256 }))
+    .addFields(
+        {
+            name: '🗝️ Your Reservation',
+            value: `Guest: ${user.toString()}\nReservation No. ${guild.memberCount}`,
+            inline: false
+        },
+        {
+            name: '📜 The House Code',
+            value: 'Respect the house. Honor the family.',
+            inline: true
+        },
+        {
+            name: '🎭 The Outfit',
+            value: 'Select your interests and find your place.',
+            inline: true
         }
-        
-        if (welcomeConfig?.roleIds && welcomeConfig.roleIds.length > 0) {
-            const delay = welcomeConfig.autoRoleDelay || 0;
-            const singleRoleId = welcomeConfig.roleIds[0];
-            
-            if (delay > 0) {
-                const timeout = setTimeout(async () => {
-                    const role = guild.roles.cache.get(singleRoleId);
-                    if (role) {
-                        await assignRoleSafely(member, role);
-                    }
-                }, delay * 1000);
-                if (typeof timeout.unref === 'function') {
-                    timeout.unref();
-                }
-            } else {
-                const role = guild.roles.cache.get(singleRoleId);
-                if (role) {
-                    await assignRoleSafely(member, role);
-                }
-            }
-        }
+    )
+    .setFooter({
+        text: 'THE B CONTINENTAL • BY ORDER OF DON BRE'
+    })
+    .setTimestamp();
+
+if (welcomeConfig.welcomeImage) {
+    embed.setImage(welcomeConfig.welcomeImage);
+} else if (welcomeConfig.welcomeEmbed?.image?.url) {
+    embed.setImage(welcomeConfig.welcomeEmbed.image.url);
+}
         
         if (config?.verification?.enabled || config?.verification?.autoVerify?.enabled) {
             await handleVerification(member, guild, config.verification, member.client);
