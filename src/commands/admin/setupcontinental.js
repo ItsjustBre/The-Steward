@@ -99,8 +99,46 @@ const PLAN = [
   }
 ];
 
-const normalize = value =>
-  value.toLowerCase().replace(/[^a-z0-9]/g, '');
+const CATEGORY_ALIASES = {
+  "Don's Office": ['donsoffice', 'donoffice'],
+  'Grand Lounge': ['grandlounge'],
+  'Bathhouse & Spa': ['bathhousespa'],
+  'The Armory': ['thearmory', 'armory'],
+  'The Archives': ['thearchives', 'archives'],
+  'Club Continental': ['clubcontinental'],
+  'V.I.P Floor': ['vipfloor'],
+  'High Table': ['hightable']
+};
+
+function normalize(value = '') {
+  const fancyUpper = '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅';
+  const fancyLower = '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟';
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+
+  let result = Array.from(String(value)).map(char => {
+    const upperIndex = Array.from(fancyUpper).indexOf(char);
+    if (upperIndex !== -1) return alphabet[upperIndex];
+
+    const lowerIndex = Array.from(fancyLower).indexOf(char);
+    if (lowerIndex !== -1) return alphabet[lowerIndex];
+
+    return char;
+  }).join('');
+
+  return result
+    .normalize('NFKD')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function categoryMatches(actualName, expectedName) {
+  const actual = normalize(actualName);
+  const expected = normalize(expectedName);
+
+  const aliases = CATEGORY_ALIASES[expectedName] || [];
+
+  return actual === expected || aliases.includes(actual);
+}
 
 function findCategory(guild, name) {
   return guild.channels.cache.find(channel =>
@@ -109,11 +147,10 @@ function findCategory(guild, name) {
   );
 }
 
-function findRole(guild, key) {
-  const aliases = ROLE_ALIASES[key] || [];
-
-  return guild.roles.cache.find(role =>
-    aliases.some(name => normalize(role.name) === normalize(name))
+function findCategory(guild, name) {
+  return guild.channels.cache.find(channel =>
+    channel.type === ChannelType.GuildCategory &&
+    categoryMatches(channel.name, name)
   );
 }
 
